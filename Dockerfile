@@ -1,5 +1,6 @@
 # Build using:
 # docker build -t kronuz/docker-image .
+# docker push kronuz/docker-image
 
 FROM alpine:3.8
 
@@ -362,6 +363,61 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
   && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
   && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
   && apk del .build-deps-yarn
+
+
+################################################################################
+#  _     _ _                    _
+# | |   (_) |__  _ __ __ _ _ __(_) ___  ___
+# | |   | | '_ \| '__/ _` | '__| |/ _ \/ __|
+# | |___| | |_) | | | (_| | |  | |  __/\__ \
+# |_____|_|_.__/|_|  \__,_|_|  |_|\___||___/
+#
+# Common libraries
+# [uwsgi, supervisor, pycrypto, pillow, psycopg2, lxml, cssselect, librabbitmq,
+# msgpack, reportlab]
+
+RUN apk add --no-cache --virtual .build-deps \
+      build-base \
+      linux-headers \
+      autoconf \
+      automake \
+      libtool \
+      # uwsgi dependencies
+      pcre-dev \
+      # pillow dependencies
+      freetype-dev \
+      jpeg-dev \
+      libwebp-dev \
+      tiff-dev \
+      libpng-dev \
+      lcms2-dev \
+      openjpeg-dev \
+      zlib-dev \
+      # psycopg2 dependencies
+      postgresql-dev \
+      # pycrypto dependencies
+      git \
+      # lxml dependencies
+      libxml2-dev \
+      libxslt-dev \
+    && pip install uwsgi \
+    && pip install pillow \
+    && pip install olefile \
+    && pip install psycopg2 \
+    && pip install git+git://github.com/kronuz/pycrypto.git \
+    && pip install lxml \
+    && pip install cssselect \
+    && pip install librabbitmq \
+    && pip install msgpack-python \
+    && pip install rlextra -i https://kronuz:reportlab@www.reportlab.com/pypi/ \
+    && pip install supervisor \
+    && apk del .build-deps \
+    && apk add \
+      libpq \
+      tiff \
+      openjpeg \
+      lcms2 \
+    && rm -rf /root/.cache
 
 
 ################################################################################
